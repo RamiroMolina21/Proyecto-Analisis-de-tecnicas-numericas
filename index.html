@@ -22,7 +22,7 @@
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background: white;
+            background: white; 
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
@@ -118,10 +118,34 @@
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .btn:hover {
+                transform: none;
+                box-shadow: none;
+            }
+            
+            .btn:active {
+                transform: scale(0.98);
+                box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            }
+        }
+
         .chart-section {
             background: #f8f9fa;
             padding: 20px;
             border-radius: 15px;
+            position: relative;
+            height: 400px;
+        }
+
+        .chart-section canvas {
+            max-height: 100%;
         }
 
         .results {
@@ -156,9 +180,196 @@
             margin-top: 10px;
         }
 
+        /* Tablet and Desktop Responsive */
         @media (max-width: 1024px) {
             .content {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        /* Mobile Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+                margin-bottom: 8px;
+                line-height: 1.2;
+            }
+
+            .header p {
+                font-size: 0.9em;
+            }
+
+            .content {
+                padding: 20px 15px;
+                gap: 15px;
+            }
+
+            .input-section {
+                padding: 15px;
+                border-radius: 12px;
+            }
+
+            .input-group {
+                margin-bottom: 15px;
+            }
+
+            .input-group label {
+                font-size: 0.95em;
+                margin-bottom: 6px;
+            }
+
+            .input-group textarea {
+                padding: 10px;
+                font-size: 0.9em;
+                min-height: 80px;
+                border-radius: 6px;
+            }
+
+            .method-select {
+                margin-bottom: 15px;
+            }
+
+            .method-select label {
+                font-size: 0.95em;
+                margin-bottom: 6px;
+            }
+
+            .method-select select {
+                padding: 10px;
+                font-size: 0.9em;
+                border-radius: 6px;
+            }
+
+            .btn {
+                padding: 12px;
+                font-size: 1em;
+                border-radius: 6px;
+            }
+
+            .chart-section {
+                padding: 15px;
+                border-radius: 12px;
+                height: 300px;
+            }
+
+            .results {
+                margin-top: 15px;
+                padding: 15px;
+                border-radius: 8px;
+            }
+
+            .results h3 {
+                font-size: 1.1em;
+                margin-bottom: 12px;
+            }
+
+            .result-item {
+                margin: 8px 0;
+                padding: 8px;
+                font-size: 0.9em;
+            }
+
+            .error {
+                padding: 8px;
+                font-size: 0.9em;
+                margin-top: 8px;
+            }
+        }
+
+        /* Small Mobile Devices */
+        @media (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+
+            .header {
+                padding: 15px 10px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+                margin-bottom: 6px;
+            }
+
+            .header p {
+                font-size: 0.85em;
+            }
+
+            .content {
+                padding: 15px 10px;
+                gap: 12px;
+            }
+
+            .input-section {
+                padding: 12px;
+            }
+
+            .input-group {
+                margin-bottom: 12px;
+            }
+
+            .input-group textarea {
+                padding: 8px;
+                font-size: 0.85em;
+                min-height: 70px;
+            }
+
+            .method-select select {
+                padding: 8px;
+                font-size: 0.85em;
+            }
+
+            .btn {
+                padding: 10px;
+                font-size: 0.95em;
+            }
+
+            .chart-section {
+                padding: 12px;
+                height: 250px;
+            }
+
+            .results {
+                padding: 12px;
+            }
+
+            .result-item {
+                margin: 6px 0;
+                padding: 6px;
+                font-size: 0.85em;
+            }
+        }
+
+        /* Extra Small Devices */
+        @media (max-width: 360px) {
+            .header h1 {
+                font-size: 1.3em;
+            }
+
+            .input-group textarea {
+                min-height: 60px;
+                font-size: 0.8em;
+            }
+
+            .method-select select {
+                font-size: 0.8em;
+            }
+
+            .btn {
+                font-size: 0.9em;
             }
         }
     </style>
@@ -553,24 +764,54 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
+                    aspectRatio: window.innerWidth < 768 ? 1.5 : 2,
                     plugins: {
                         title: {
                             display: true,
                             text: 'Ajuste de Curva - ' + method.toUpperCase(),
-                            font: { size: 18 }
+                            font: { 
+                                size: window.innerWidth < 768 ? 14 : 18 
+                            }
                         },
                         legend: {
                             display: true,
-                            position: 'top'
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: window.innerWidth < 768 ? 10 : 12
+                                }
+                            }
                         }
                     },
                     scales: {
                         x: {
-                            title: { display: true, text: 'X', font: { size: 14 } }
+                            title: { 
+                                display: true, 
+                                text: 'X', 
+                                font: { 
+                                    size: window.innerWidth < 768 ? 10 : 14 
+                                } 
+                            },
+                            ticks: {
+                                font: {
+                                    size: window.innerWidth < 768 ? 9 : 12
+                                }
+                            }
                         },
                         y: {
-                            title: { display: true, text: 'Y', font: { size: 14 } }
+                            title: { 
+                                display: true, 
+                                text: 'Y', 
+                                font: { 
+                                    size: window.innerWidth < 768 ? 10 : 14 
+                                } 
+                            },
+                            ticks: {
+                                font: {
+                                    size: window.innerWidth < 768 ? 9 : 12
+                                }
+                            }
                         }
                     }
                 }
