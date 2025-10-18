@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluador de Ajuste de Curvas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: monospace;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .method-select {
+            margin-bottom: 20px;
+        }
+
+        .method-select label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .method-select select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            background: white;
+            cursor: pointer;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .chart-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .results {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .results h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .result-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .result-item strong {
+            color: #333;
+        }
+
+        .error {
+            color: #e74c3c;
+            padding: 10px;
+            background: #fadbd8;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Evaluador de Ajuste de Curvas</h1>
+            <p>Análisis avanzado con 10 métodos de regresión</p>
+        </div>
+
+        <div class="content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label>Valores de X (separados por comas):</label>
+                    <textarea id="xValues" placeholder="Ejemplo: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10">1, 2, 3, 4, 5, 6, 7, 8, 9, 10</textarea>
+                </div>
+
+                <div class="input-group">
+                    <label>Valores de Y (separados por comas):</label>
+                    <textarea id="yValues" placeholder="Ejemplo: 2.1, 4.3, 6.2, 8.5, 10.1, 12.3, 14.8, 16.5, 18.9, 20.5">2.1, 4.3, 6.2, 8.5, 10.1, 12.3, 14.8, 16.5, 18.9, 20.5</textarea>
+                </div>
+
+                <div class="method-select">
+                    <label>Método de Ajuste:</label>
+                    <select id="methodSelect">
+                        <option value="linear">Ajuste Lineal</option>
+                        <option value="exponential">Exponencial</option>
+                        <option value="geometric">Geométrica</option>
+                        <option value="hyperbolic">Hiperbólica</option>
+                        <option value="polynomial2">Polinómica (Grado 2)</option>
+                        <option value="polynomial3">Polinómica (Grado 3)</option>
+                        <option value="polynomial4">Polinómica (Grado 4)</option>
+                        <option value="movingAverage">Media Móvil</option>
+                        <option value="expAsymptotic">Exponencial Asintótico</option>
+                        <option value="logistic">Logístico</option>
+                        <option value="logarithmic">Logarítmico</option>
+                        <option value="power">Potencial</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="calculateFit()">Calcular Ajuste</button>
+
+                <div id="results"></div>
+            </div>
+
+            <div class="chart-section">
+                <canvas id="chart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let chart = null;
+
+        function parseInput(input) {
+            return input.split(',').map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
+        }
+
+        function linearRegression(x, y) {
+            const n = x.length;
+            const sumX = x.reduce((a, b) => a + b, 0);
+            const sumY = y.reduce((a, b) => a + b, 0);
+            const sumXY = x.reduce((acc, xi, i) => acc + xi * y[i], 0);
+            const sumX2 = x.reduce((acc, xi) => acc + xi * xi, 0);
+
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+
+            return { slope, intercept, equation: `y = ${slope.toFixed(4)}x + ${intercept.toFixed(4)}` };
+        }
+
+        function exponentialFit(x, y) {
+            const lnY = y.map(yi => Math.log(yi));
+            const { slope, intercept } = linearRegression(x, lnY);
+            const a = Math.exp(intercept);
+            const b = slope;
+            return { a, b, equation: `y = ${a.toFixed(4)} * e^(${b.toFixed(4)}x)` };
+        }
+
+        function geometricFit(x, y) {
+            const lnX = x.map(xi => Math.log(xi));
+            const lnY = y.map(yi => Math.log(yi));
+            const { slope, intercept } = linearRegression(lnX, lnY);
+            const a = Math.exp(intercept);
+            const b = slope;
+            return { a, b, equation: `y = ${a.toFixed(4)} * x^${b.toFixed(4)}` };
+        }
+
+        function hyperbolicFit(x, y) {
+            const invX = x.map(xi => 1 / xi);
+            const { slope, intercept } = linearRegression(invX, y);
+            return { a: intercept, b: slope, equation: `y = ${intercept.toFixed(4)} + ${slope.toFixed(4)}/x` };
+        }
+
+        function polynomialRegression(x, y, degree) {
+            const n = x.length;
+            const X = [];
+            for (let i = 0; i < n; i++) {
+                X[i] = [];
+                for (let j = 0; j <= degree; j++) {
+                    X[i][j] = Math.pow(x[i], j);
+                }
+            }
+
+            const XT = transpose(X);
+            const XTX = multiply(XT, X);
+            const XTY = multiply(XT, y.map(yi => [yi]));
+            const coeffs = gaussianElimination(XTX, XTY);
+
+            let equation = 'y = ';
+            for (let i = coeffs.length - 1; i >= 0; i--) {
+                if (i === coeffs.length - 1) {
+                    equation += `${coeffs[i].toFixed(4)}x^${i}`;
+                } else if (i === 0) {
+                    equation += ` + ${coeffs[i].toFixed(4)}`;
+                } else {
+                    equation += ` + ${coeffs[i].toFixed(4)}x^${i}`;
+                }
+            }
+
+            return { coeffs, equation };
+        }
+
+        function transpose(matrix) {
+            return matrix[0].map((_, i) => matrix.map(row => row[i]));
+        }
+
+        function multiply(a, b) {
+            const result = [];
+            for (let i = 0; i < a.length; i++) {
+                result[i] = [];
+                for (let j = 0; j < b[0].length; j++) {
+                    let sum = 0;
+                    for (let k = 0; k < a[0].length; k++) {
+                        sum += a[i][k] * b[k][j];
+                    }
+                    result[i][j] = sum;
+                }
+            }
+            return result;
+        }
+
+        function gaussianElimination(A, B) {
+            const n = A.length;
+            const aug = A.map((row, i) => [...row, B[i][0]]);
+
+            for (let i = 0; i < n; i++) {
+                let maxRow = i;
+                for (let k = i + 1; k < n; k++) {
+                    if (Math.abs(aug[k][i]) > Math.abs(aug[maxRow][i])) {
+                        maxRow = k;
+                    }
+                }
+                [aug[i], aug[maxRow]] = [aug[maxRow], aug[i]];
+
+                for (let k = i + 1; k < n; k++) {
+                    const factor = aug[k][i] / aug[i][i];
+                    for (let j = i; j <= n; j++) {
+                        aug[k][j] -= factor * aug[i][j];
+                    }
+                }
+            }
+
+            const x = new Array(n);
+            for (let i = n - 1; i >= 0; i--) {
+                x[i] = aug[i][n];
+                for (let j = i + 1; j < n; j++) {
+                    x[i] -= aug[i][j] * x[j];
+                }
+                x[i] /= aug[i][i];
+            }
+            return x;
+        }
+
+        function movingAverage(x, y, window = 3) {
+            const result = [];
+            for (let i = 0; i < y.length; i++) {
+                const start = Math.max(0, i - Math.floor(window / 2));
+                const end = Math.min(y.length, i + Math.ceil(window / 2));
+                const sum = y.slice(start, end).reduce((a, b) => a + b, 0);
+                result.push(sum / (end - start));
+            }
+            return { values: result, equation: `Media móvil (ventana ${window})` };
+        }
+
+        function expAsymptoticFit(x, y) {
+            const yMax = Math.max(...y);
+            const transformed = y.map(yi => Math.log(yMax - yi));
+            const { slope, intercept } = linearRegression(x, transformed);
+            const a = yMax;
+            const b = Math.exp(intercept);
+            const c = -slope;
+            return { a, b, c, equation: `y = ${a.toFixed(4)} - ${b.toFixed(4)} * e^(-${c.toFixed(4)}x)` };
+        }
+
+        function logisticFit(x, y) {
+            const L = Math.max(...y) * 1.1;
+            const transformed = y.map(yi => Math.log((L - yi) / yi));
+            const { slope, intercept } = linearRegression(x, transformed);
+            const k = -slope;
+            const x0 = intercept / slope;
+            return { L, k, x0, equation: `y = ${L.toFixed(4)} / (1 + e^(-${k.toFixed(4)}(x-${x0.toFixed(4)})))` };
+        }
+
+        function logarithmicFit(x, y) {
+            const lnX = x.map(xi => Math.log(xi));
+            const { slope, intercept } = linearRegression(lnX, y);
+            return { a: slope, b: intercept, equation: `y = ${slope.toFixed(4)} * ln(x) + ${intercept.toFixed(4)}` };
+        }
+
+        function powerFit(x, y) {
+            return geometricFit(x, y);
+        }
+
+        function calculateR2(yActual, yPredicted) {
+            const yMean = yActual.reduce((a, b) => a + b, 0) / yActual.length;
+            const ssTotal = yActual.reduce((acc, yi) => acc + Math.pow(yi - yMean, 2), 0);
+            const ssRes = yActual.reduce((acc, yi, i) => acc + Math.pow(yi - yPredicted[i], 2), 0);
+            return 1 - (ssRes / ssTotal);
+        }
+
+        function predictValues(x, params, method) {
+            return x.map(xi => {
+                switch (method) {
+                    case 'linear':
+                        return params.slope * xi + params.intercept;
+                    case 'exponential':
+                        return params.a * Math.exp(params.b * xi);
+                    case 'geometric':
+                    case 'power':
+                        return params.a * Math.pow(xi, params.b);
+                    case 'hyperbolic':
+                        return params.a + params.b / xi;
+                    case 'polynomial2':
+                    case 'polynomial3':
+                    case 'polynomial4':
+                        return params.coeffs.reduce((acc, c, i) => acc + c * Math.pow(xi, i), 0);
+                    case 'expAsymptotic':
+                        return params.a - params.b * Math.exp(-params.c * xi);
+                    case 'logistic':
+                        return params.L / (1 + Math.exp(-params.k * (xi - params.x0)));
+                    case 'logarithmic':
+                        return params.a * Math.log(xi) + params.b;
+                    default:
+                        return 0;
+                }
+            });
+        }
+
+        function calculateFit() {
+            const xInput = document.getElementById('xValues').value;
+            const yInput = document.getElementById('yValues').value;
+            const method = document.getElementById('methodSelect').value;
+
+            const x = parseInput(xInput);
+            const y = parseInput(yInput);
+
+            const resultsDiv = document.getElementById('results');
+
+            if (x.length === 0 || y.length === 0 || x.length !== y.length) {
+                resultsDiv.innerHTML = '<div class="error">Error: Asegúrate de ingresar datos válidos y que ambas listas tengan la misma longitud.</div>';
+                return;
+            }
+
+            let params, yPredicted;
+
+            try {
+                switch (method) {
+                    case 'linear':
+                        params = linearRegression(x, y);
+                        yPredicted = predictValues(x, params, method);
+                        break;
+                    case 'exponential':
+                        params = exponentialFit(x, y);
+                        yPredicted = predictValues(x, params, method);
+                        break;
+                    case 'geometric':
+                        params = geometricFit(x, y);
+                        yPredicted = predictValues(x, params, method);
+                        break;
+                    case 'hyperbolic':
+                        params = hyperbolicFit(x, y);
+                        yPredicted = predictValues(x, params, method);
+                        break;
+                    case 'polynomial2':
+                        params = polynomialRegression(x, y, 2);
+                        yPredicted = predictValues(x, params, method);
+                        break;
+                    case 'polynomial3':
+                        params = polynomialRegression(x, y, 3);
+                        yPredicted = predictValues(x, params, method);
+                        break;
+                    case 'polynomial4':
+                        params = polynomialRegression(x, y, 4);
+                        yPredicted = predictValues(x, params, method);
+                        break;
+                    case 'movingAverage':
+                        params = movingAverage(x, y);
+                        yPredicted = params.values;
+                        break;
+                    case 'expAsymptotic':
+                        params = expAsymptoticFit(x, y);
+                        yPredicted = predictValues(x, params, method);
+                        break;
+                    case 'logistic':
+                        params = logisticFit(x, y);
+                        yPredicted = predictValues(x, params, method);
+                        break;
+                    case 'logarithmic':
+                        params = logarithmicFit(x, y);
+                        yPredicted = predictValues(x, params, method);
+                        break;
+                    case 'power':
+                        params = powerFit(x, y);
+                        yPredicted = predictValues(x, params, method);
+                        break;
+                }
+
+                const r2 = calculateR2(y, yPredicted);
+                
+                // Calcular errores
+                const errors = y.map((yi, i) => yi - yPredicted[i]);
+                const mse = errors.reduce((acc, e) => acc + e * e, 0) / errors.length;
+                const rmse = Math.sqrt(mse);
+                const mae = errors.reduce((acc, e) => acc + Math.abs(e), 0) / errors.length;
+                const maxError = Math.max(...errors.map(Math.abs));
+                const minError = Math.min(...errors.map(Math.abs));
+
+                resultsDiv.innerHTML = `
+                    <div class="results">
+                        <h3>Resultados del Ajuste</h3>
+                        <div class="result-item">
+                            <strong>Ecuación:</strong> ${params.equation}
+                        </div>
+                        <div class="result-item">
+                            <strong>R² (Coeficiente de Determinación):</strong> ${r2.toFixed(6)}
+                        </div>
+                        <div class="result-item">
+                            <strong>Calidad del Ajuste:</strong> ${r2 > 0.9 ? 'Excelente' : r2 > 0.7 ? 'Bueno' : r2 > 0.5 ? 'Moderado' : 'Bajo'}
+                        </div>
+                        <div class="result-item">
+                            <strong>MSE (Error Cuadrático Medio):</strong> ${mse.toFixed(6)}
+                        </div>
+                        <div class="result-item">
+                            <strong>RMSE (Raíz del Error Cuadrático Medio):</strong> ${rmse.toFixed(6)}
+                        </div>
+                        <div class="result-item">
+                            <strong>MAE (Error Absoluto Medio):</strong> ${mae.toFixed(6)}
+                        </div>
+                        <div class="result-item">
+                            <strong>Error Máximo:</strong> ${maxError.toFixed(6)}
+                        </div>
+                        <div class="result-item">
+                            <strong>Error Mínimo:</strong> ${minError.toFixed(6)}
+                        </div>
+                    </div>
+                `;
+
+                drawChart(x, y, yPredicted, method);
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="error">Error al calcular el ajuste: ${error.message}</div>`;
+            }
+        }
+
+        function drawChart(x, y, yPredicted, method) {
+            const ctx = document.getElementById('chart').getContext('2d');
+
+            if (chart) {
+                chart.destroy();
+            }
+
+            chart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Datos Originales',
+                        data: x.map((xi, i) => ({ x: xi, y: y[i] })),
+                        backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        pointRadius: 6
+                    }, {
+                        label: 'Curva Ajustada',
+                        data: x.map((xi, i) => ({ x: xi, y: yPredicted[i] })),
+                        type: 'line',
+                        borderColor: 'rgba(231, 76, 60, 1)',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Ajuste de Curva - ' + method.toUpperCase(),
+                            font: { size: 18 }
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'X', font: { size: 14 } }
+                        },
+                        y: {
+                            title: { display: true, text: 'Y', font: { size: 14 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        window.onload = function() {
+            calculateFit();
+        };
+    </script>
+</body>
+</html>
