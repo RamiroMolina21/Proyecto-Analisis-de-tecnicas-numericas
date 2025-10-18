@@ -142,10 +142,13 @@
             border-radius: 15px;
             position: relative;
             height: 400px;
+            overflow: hidden;
         }
 
         .chart-section canvas {
             max-height: 100%;
+            width: 100% !important;
+            height: auto !important;
         }
 
         .results {
@@ -262,7 +265,8 @@
             .chart-section {
                 padding: 15px;
                 border-radius: 12px;
-                height: 300px;
+                height: 350px;
+                min-height: 300px;
             }
 
             .results {
@@ -339,7 +343,8 @@
 
             .chart-section {
                 padding: 12px;
-                height: 250px;
+                height: 300px;
+                min-height: 250px;
             }
 
             .results {
@@ -370,6 +375,31 @@
 
             .btn {
                 font-size: 0.9em;
+            }
+
+            .chart-section {
+                height: 280px;
+                min-height: 250px;
+                padding: 10px;
+            }
+        }
+
+        /* Chart specific mobile improvements */
+        @media (max-width: 768px) {
+            .chart-section {
+                margin-bottom: 20px;
+            }
+            
+            .chart-section canvas {
+                touch-action: manipulation;
+            }
+        }
+
+        /* Landscape mobile orientation */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .chart-section {
+                height: 250px;
+                min-height: 200px;
             }
         }
     </style>
@@ -765,22 +795,51 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    aspectRatio: window.innerWidth < 768 ? 1.5 : 2,
+                    aspectRatio: window.innerWidth < 768 ? 1.2 : 2,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
                     plugins: {
                         title: {
                             display: true,
                             text: 'Ajuste de Curva - ' + method.toUpperCase(),
                             font: { 
-                                size: window.innerWidth < 768 ? 14 : 18 
+                                size: window.innerWidth < 768 ? 12 : 18,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                top: 10,
+                                bottom: 20
                             }
                         },
                         legend: {
                             display: true,
                             position: 'top',
+                            align: 'center',
                             labels: {
                                 font: {
-                                    size: window.innerWidth < 768 ? 10 : 12
-                                }
+                                    size: window.innerWidth < 768 ? 9 : 12
+                                },
+                                padding: 15,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: 'white',
+                            bodyColor: 'white',
+                            borderColor: 'rgba(102, 126, 234, 1)',
+                            borderWidth: 1,
+                            cornerRadius: 6,
+                            displayColors: true,
+                            titleFont: {
+                                size: window.innerWidth < 768 ? 10 : 12
+                            },
+                            bodyFont: {
+                                size: window.innerWidth < 768 ? 9 : 11
                             }
                         }
                     },
@@ -790,13 +849,21 @@
                                 display: true, 
                                 text: 'X', 
                                 font: { 
-                                    size: window.innerWidth < 768 ? 10 : 14 
-                                } 
+                                    size: window.innerWidth < 768 ? 9 : 14,
+                                    weight: 'bold'
+                                },
+                                color: '#333'
                             },
                             ticks: {
                                 font: {
-                                    size: window.innerWidth < 768 ? 9 : 12
-                                }
+                                    size: window.innerWidth < 768 ? 8 : 12
+                                },
+                                color: '#666',
+                                maxTicksLimit: window.innerWidth < 768 ? 6 : 10
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)',
+                                drawBorder: false
                             }
                         },
                         y: {
@@ -804,13 +871,21 @@
                                 display: true, 
                                 text: 'Y', 
                                 font: { 
-                                    size: window.innerWidth < 768 ? 10 : 14 
-                                } 
+                                    size: window.innerWidth < 768 ? 9 : 14,
+                                    weight: 'bold'
+                                },
+                                color: '#333'
                             },
                             ticks: {
                                 font: {
-                                    size: window.innerWidth < 768 ? 9 : 12
-                                }
+                                    size: window.innerWidth < 768 ? 8 : 12
+                                },
+                                color: '#666',
+                                maxTicksLimit: window.innerWidth < 768 ? 5 : 8
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)',
+                                drawBorder: false
                             }
                         }
                     }
