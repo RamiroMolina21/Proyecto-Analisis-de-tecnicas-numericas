@@ -283,6 +283,64 @@
             margin-bottom: 15px;
         }
 
+        /* Nueva sección de instrucciones */
+        .instructions-section {
+            line-height: 1.6;
+        }
+
+        .instructions-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .instructions-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            margin-top: 25px;
+        }
+
+        .instructions-section p {
+            margin-bottom: 15px;
+        }
+
+        .instructions-section ul, .instructions-section ol {
+            margin-bottom: 15px;
+            margin-left: 20px;
+        }
+
+        .instructions-section li {
+            margin-bottom: 8px;
+        }
+
+        .instructions-section code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .instructions-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .instructions-box h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .instructions-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 15px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
         /* Tablet and Desktop Responsive */
         @media (max-width: 1024px) {
             .content {
@@ -538,6 +596,7 @@
 
         <div class="tabs">
             <div class="tab active" data-tab="calculator">Calculadora</div>
+            <div class="tab" data-tab="instructions">Instrucciones</div>
             <div class="tab" data-tab="methods">Métodos</div>
             <div class="tab" data-tab="about">Integrantes</div>
         </div>
@@ -625,6 +684,103 @@
                     <div id="comparisonCharts" class="comparison-charts">
                         <!-- Aquí se agregarán las gráficas de comparación y errores -->
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña de Instrucciones -->
+        <div class="tab-content" id="instructions">
+            <div class="instructions-section">
+                <h2>Guía de Uso del Evaluador de Ajuste de Curvas</h2>
+                
+                <div class="instructions-box">
+                    <h4>📝 Introducción</h4>
+                    <p>Esta herramienta te permite analizar y comparar diferentes métodos de ajuste de curvas para tus datos. Puedes evaluar individualmente cada método o comparar varios simultáneamente para determinar cuál se ajusta mejor a tus datos.</p>
+                </div>
+
+                <h3>📊 Cómo Ingresar los Datos</h3>
+                <p>Para comenzar, necesitas ingresar tus datos en las dos áreas de texto principales:</p>
+                
+                <ol>
+                    <li><strong>Valores de X:</strong> Ingresa los valores de la variable independiente separados por comas.</li>
+                    <li><strong>Valores de Y:</strong> Ingresa los valores de la variable dependiente separados por comas.</li>
+                </ol>
+                
+                <div class="instructions-box">
+                    <h4>⚠️ Importante</h4>
+                    <p>Asegúrate de que:</p>
+                    <ul>
+                        <li>Ambas listas tengan la misma cantidad de valores</li>
+                        <li>Los valores estén separados únicamente por comas</li>
+                        <li>Los valores sean numéricos válidos</li>
+                        <li>No incluyas texto ni caracteres especiales</li>
+                    </ul>
+                </div>
+
+                <h3>🔧 Configuración de Métodos</h3>
+                <p>La herramienta ofrece dos formas de trabajar con los métodos de ajuste:</p>
+                
+                <h4>1. Método Individual</h4>
+                <p>Selecciona un método específico del menú desplegable para analizarlo individualmente. Esto te permite:</p>
+                <ul>
+                    <li>Ver la ecuación específica del ajuste</li>
+                    <li>Obtener métricas detalladas de calidad</li>
+                    <li>Visualizar la curva ajustada junto con los datos originales</li>
+                </ul>
+                
+                <h4>2. Comparación de Múltiples Métodos</h4>
+                <p>Selecciona varios métodos marcando las casillas correspondientes. Esto te permitirá:</p>
+                <ul>
+                    <li>Comparar visualmente diferentes curvas de ajuste</li>
+                    <li>Analizar los errores de cada método</li>
+                    <li>Identificar rápidamente el método que mejor se ajusta a tus datos</li>
+                </ul>
+
+                <h3>📈 Interpretación de Resultados</h3>
+                <p>Después de calcular el ajuste, obtendrás los siguientes resultados:</p>
+                
+                <h4>Métricas de Calidad</h4>
+                <ul>
+                    <li><strong>R² (Coeficiente de Determinación):</strong> Mide qué tan bien se ajusta el modelo a los datos. Valores cercanos a 1 indican mejor ajuste.</li>
+                    <li><strong>MSE (Error Cuadrático Medio):</strong> Promedio de los cuadrados de los errores.</li>
+                    <li><strong>RMSE (Raíz del Error Cuadrático Medio):</strong> Raíz cuadrada del MSE, en las mismas unidades que los datos originales.</li>
+                    <li><strong>MAE (Error Absoluto Medio):</strong> Promedio de los valores absolutos de los errores.</li>
+                </ul>
+                
+                <h4>Gráficas</h4>
+                <ul>
+                    <li><strong>Gráfica Principal:</strong> Muestra los datos originales y la curva ajustada para el método seleccionado.</li>
+                    <li><strong>Gráfica de Comparación:</strong> Muestra múltiples curvas de ajuste cuando se seleccionan varios métodos.</li>
+                    <li><strong>Gráfica de Errores:</strong> Visualiza los errores absolutos de cada método para facilitar la comparación.</li>
+                </ul>
+
+                <h3>💡 Consejos para un Uso Efectivo</h3>
+                <div class="instructions-box">
+                    <h4>Selección del Método Adecuado</h4>
+                    <ul>
+                        <li>Si tus datos parecen seguir una línea recta, usa <strong>Ajuste Lineal</strong></li>
+                        <li>Para crecimiento acelerado, prueba <strong>Exponencial</strong> o <strong>Potencial</strong></li>
+                        <li>Para datos que se estabilizan, considera <strong>Logístico</strong> o <strong>Exponencial Asintótico</strong></li>
+                        <li>Para relaciones complejas, los <strong>Polinómicos</strong> de mayor grado pueden ser útiles</li>
+                    </ul>
+                </div>
+
+                <h3>🔍 Ejemplo Práctico</h3>
+                <p>Para probar la herramienta, puedes usar los datos de ejemplo ya cargados:</p>
+                <ul>
+                    <li><strong>Valores X:</strong> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10</li>
+                    <li><strong>Valores Y:</strong> 2.1, 4.3, 6.2, 8.5, 10.1, 12.3, 14.8, 15.5, 18.9, 36.5</li>
+                </ul>
+                <p>Selecciona diferentes métodos y observa cómo varían las métricas de calidad y las curvas ajustadas.</p>
+
+                <div class="instructions-box">
+                    <h4>📱 Uso en Dispositivos Móviles</h4>
+                    <p>La herramienta está optimizada para uso en dispositivos móviles. Puedes:</p>
+                    <ul>
+                        <li>Usar gestos táctiles para hacer zoom en las gráficas</li>
+                        <li>Tocar los puntos de datos para ver información detallada</li>
+                        <li>Deslizar para navegar entre diferentes secciones</li>
+                    </ul>
                 </div>
             </div>
         </div>
